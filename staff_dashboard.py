@@ -96,7 +96,6 @@ def manage_rooms():
                     f"Persons: {r[4]} | Amount: ₹{r[5]}"
                 )
 
-                # Add a button to mark checkout manually
                 if r[3] is None:  # Only show if check-out is not already set
                     if st.button(f"Mark Checkout for Room {r[1]} (User ID {r[0]})"):
                         with get_connection() as conn2:
@@ -146,6 +145,36 @@ def manage_rooms():
                     st.success(f"Room {room_no} added with User ID {new_id}.")
                     st.rerun()
 
+def show_preferences():
+    st.subheader("Guest Preferences")
+
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT p.user_id, p.room_no, p.temperature, p.diet, p.menu_type,
+                       p.pillow_type, p.allergies, p.lighting_preference,
+                       p.wake_up_call, p.music_preference, p.language_preference
+                FROM preferences p
+                JOIN rooms r ON p.user_id = r.user_id AND p.room_no = r.room_no
+                WHERE r.check_out IS NULL
+            """)
+            rows = cur.fetchall()
+
+            if not rows:
+                st.info("No active guest preferences found.")
+                return
+
+            for r in rows:
+                with st.expander(f"👤 User {r[0]} | Room {r[1]}"):
+                    st.write(f"🌡️ Temperature: {r[2]}")
+                    st.write(f"🥗 Diet: {r[3]}")
+                    st.write(f"📖 Menu Type: {r[4]}")
+                    st.write(f"🛏️ Pillow: {r[5]}")
+                    st.write(f"⚠️ Allergies: {r[6]}")
+                    st.write(f"💡 Lighting: {r[7]}")
+                    st.write(f"⏰ Wake-up Call: {r[8]}")
+                    st.write(f"🎵 Music: {r[9]}")
+                    st.write(f"🈯 Language: {r[10]}")
 
 def show_billing():
     st.subheader("Billing Summary")
@@ -162,8 +191,8 @@ def show_billing():
 
 st.title("🏨 Hotel Staff Dashboard")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "🧾 Food", "🧺 Laundry", "🧹 Cleaning", "🚗 Travel", "🏠 Rooms & Billing"
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "🧾 Food", "🧺 Laundry", "🧹 Cleaning", "🚗 Travel", "🏠 Rooms & Billing", "Preferences"
 ])
 
 with tab1:
@@ -181,3 +210,6 @@ with tab4:
 with tab5:
     manage_rooms()
     show_billing()
+
+with tab6:
+    show_preferences()
