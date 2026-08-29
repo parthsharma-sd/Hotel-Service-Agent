@@ -14,7 +14,7 @@ A conversational AI assistant for Ralton Hotel, Shillong. This chatbot helps gue
 - Youtube room preview
 - Can attempt for making mental health better
 - Suggest indoor activites
-- Offline fallback
+- Reception fallback
 - Travel fare estimations
 - General wifi password giving
 - Events/banquet hall booking(currently via reception)
@@ -27,7 +27,7 @@ A conversational AI assistant for Ralton Hotel, Shillong. This chatbot helps gue
 
 ## 📸 Demo Video
 
-https://github.com/user-attachments/assets/e213a310-1653-4764-870d-52949792b997
+https://github.com/user-attachments/assets/7b7806e6-dda8-4ab0-b2cd-90ce6ae4e5be
 
 ---
 ## Hotel Dashboard 
@@ -44,12 +44,12 @@ https://github.com/user-attachments/assets/b31bbf9e-2510-4e05-9ff8-1d2f4a0bf524
 | Database           | PostgreSQL                                |
 | Backend Logic      | LangChain Agents + Tools                  |
 | UI                 | Streamlit                                 |
-| Deployment         | Render(database) and Hugging Face Spaces(chatbot) |
+| Deployment         | Render(database) and Hugging Face Spaces(Agent) |
 | Dashboard          | Power BI                                  |
 | Interface          | Hugging Face Spaces                       |
 
 ---
-## 🔗Link to access the chatbot:
+## 🔗Link to access the Agent:
 ```https://vidhan66-hotel-agent.hf.space```
 
 ## 🔗Link for Staff Interface
@@ -91,12 +91,12 @@ This project requires a Google Generative AI API key (Gemini Flash 2.0) for resp
 - Guest wants to book food/laundry/taxi etc.
   
 ## 🔍 Limitations & Future Enhancements
-- Currently only supports English.
 - Info is retrieved from the local knowledge base which will need manual updates so, it can’t dynamically learn or adapt to new queries or services added without updating the vector store and will answer directly by invoking LLM.
-- Future: Add payment system.
+- Future Scope: Expansion to Weather aware suggestions, spa bookings, post-checkout engagement, WhatsApp integration, ID
+ verification, Login Authorization, Payment system.
 
 ## 🔒 Note on Data Privacy
-No sensitive user data is collected. Google Forms used for feedback/bookings are not linked to response sheets.
+No sensitive user data is collected. Google Forms used for feedback are not linked to response sheets.
 
 ## 👤 Author
 
