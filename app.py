@@ -1,5 +1,5 @@
 import streamlit as st
-from main import agent_executor
+from backend import agent_executor
 
 st.set_page_config(page_title="Ralton Hotel", page_icon="🏨")
 
@@ -140,3 +140,4 @@ with st.container():
             if user_input.strip():
                 process_user_input(user_input)
                 st.rerun()
+
