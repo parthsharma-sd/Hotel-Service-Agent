@@ -17,7 +17,6 @@ Room & Food Service:
 - Food can be ordered until 11:00 PM (including Breakfast, Lunch and Dinner)
 - Room charge is ₹1200 per day(including night) and ₹700 per night(if booking is only for night).
 
-
 Wi-Fi:
 - Free Wi-Fi available in all rooms
 - Network: Ralton_guest
@@ -42,9 +41,12 @@ Events and Banquets:
 - Booking required at least 2 days in advance
 - Event catering available
 
-Other Facilities:
+Fun Activities:
 - Gym open 6:00 AM – 8:00 PM
 - Swimming pool: 7:00 AM – 9:00 PM
+- Bowling 9:00 AM - 10:00 PM
+- Game Section (Basketball, Car/Bike Race, Boxing,Whack a mole,VR Roller Coaster, Temple-Run etc.)
+- Spa 11:00 AM - 8:00 PM
 
 Emergency Services:
 - First-aid kit available (Contact via room phone or chatbot)

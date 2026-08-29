@@ -14,7 +14,6 @@ import psycopg2
 from typing import Optional
 from dotenv import load_dotenv
 import os
-import re
 from datetime import date,time
 import math
 import json
@@ -90,6 +89,8 @@ system_prompt = ChatPromptTemplate.from_messages([
     - Travel options and bookings.
     - Hotel services: check-in/check-out time, last kitchen order time, food, laundry, cleaning.
     - Fare estimation.
+    - If user is feeling bad or depressed, suggest fun activities(without time unless explicitly asked) that are available in hotel_services.txt, Don't suggest activities 
+        that are not present. If user want to book, tell them to go the respective room and raise a ticket (similar to a prepaid card system).
     - Room bookings:
         * Ask for arrival date, number of persons, and stay duration (days or nights).
         * Only 4 people allowed per room.
@@ -229,7 +230,7 @@ def extract_preferences(pref_text: str, llm) -> Preferences:
         return Preferences(**data)
     except Exception as e:
         print("LLM parsing failed:", e, response.content)
-        return Preferences()  # fallback all None
+        return Preferences()  
 def save_preferences(cursor, user_id: int, room_no: int, prefs: Preferences):
     """Insert structured preferences into DB."""
     cursor.execute("""
