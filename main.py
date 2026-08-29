@@ -15,8 +15,9 @@ from typing import Optional
 from dotenv import load_dotenv
 import os
 import re
-from datetime import date
+from datetime import date,time
 import math
+import json
 
 load_dotenv()
 os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY1")
@@ -49,6 +50,17 @@ class Travel_service(BaseModel):
     destination : str
     request_time : Optional[str] = None
 
+class Preferences(BaseModel):
+    temperature: Optional[str] = None
+    diet: Optional[str] = None
+    menu_type: Optional[str] = None
+    pillow_type: Optional[str] = None
+    allergies: Optional[str] = None
+    lighting_preference: Optional[str] = None
+    wake_up_call: Optional[time] = None
+    music_preference: Optional[str] = None
+    language_preference: Optional[str] = None
+
 class Rooms_booking(BaseModel):
     check_in : date
     no_of_persons : int
@@ -57,6 +69,7 @@ class Rooms_booking(BaseModel):
     nights : Optional[int] = None
     preferred_floor : Optional[int] = None
     confirm: Optional[bool] = None
+    preferences: Optional[str] = None
 
 class CheckoutRoom(BaseModel):
     room_no: int
@@ -182,6 +195,60 @@ def get_available_rooms(conn, preferred_floor=None):
     available_rooms = [room for room in all_rooms if room not in booked_rooms]
     return available_rooms
 
+def extract_preferences(pref_text: str, llm) -> Preferences:
+    """Use LLM to classify free-text preferences into schema."""
+    if not pref_text:
+        return Preferences()
+
+    prompt = f"""
+    You are an information extractor.
+    Extract hotel guest preferences from this text and return JSON
+    matching this schema exactly:
+
+    {{
+        "temperature": str or null,
+        "diet": str or null,
+        "menu_type": str or null,
+        "pillow_type": str or null,
+        "allergies": str or null,
+        "lighting_preference": str or null,
+        "wake_up_call": str (HH:MM 24h) or null,
+        "music_preference": str or null,
+        "language_preference": str or null
+    }}
+
+    Text: {pref_text}
+    """
+    response = llm.invoke(prompt).content.strip()
+    if response.startswith("```"):
+        response = response.strip("`")
+        if response.lower().startswith("json"):
+            response = response[4:].strip()
+    try:
+        data = json.loads(response)
+        return Preferences(**data)
+    except Exception as e:
+        print("LLM parsing failed:", e, response.content)
+        return Preferences()  # fallback all None
+def save_preferences(cursor, user_id: int, room_no: int, prefs: Preferences):
+    """Insert structured preferences into DB."""
+    cursor.execute("""
+        INSERT INTO preferences 
+        (user_id, room_no, temperature, diet, menu_type, pillow_type, allergies,
+         lighting_preference, wake_up_call, music_preference, language_preference)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        user_id, room_no,
+        prefs.temperature,
+        prefs.diet,
+        prefs.menu_type,
+        prefs.pillow_type,
+        prefs.allergies,
+        prefs.lighting_preference,
+        prefs.wake_up_call,
+        prefs.music_preference,
+        prefs.language_preference
+    ))
 @tool(return_direct=True)
 def book_room(data: Rooms_booking) -> str:
     "Handles booking of room in database"
@@ -193,6 +260,7 @@ def book_room(data: Rooms_booking) -> str:
     nights = data.nights or 0
     preferred_floor = data.preferred_floor
     confirm = data.confirm
+    preferences_text = data.preferences
 
     price_day = int(re.search(r"\d+", (lambda r: (r["result"] if isinstance(r, dict) else r))(ask_hotel_info("Tell me the exact room charge per day including night in ₹ only."))).group())
     print(price_day)
@@ -254,8 +322,19 @@ def book_room(data: Rooms_booking) -> str:
     preview = "https://www.youtube.com/shorts/bQacaAAU_Z4"
     if confirm is None:
         return (
-        f"You need {rooms_needed} room(s). Estimated cost is ₹{estimated_total_price}.\n\n Room preview- {preview}\n\n"
-        f"Should I proceed with booking?"
+            f"You need {rooms_needed} room(s). Estimated cost is ₹{estimated_total_price}.\n\n"
+            f"Room preview- {preview}\n\n"
+            "Before confirming, could you please share your preferences?\n"
+            "- Temperature\n"
+            "- Diet (Veg/Non-veg)\n"
+            "- Menu type (Normal/Large-Print/Braille)\n"
+            "- Pillow type (Soft/Hard/Feather)\n"
+            "- Allergies (if any)\n"
+            "- Lighting preference (Dim/Bright/Natural)\n"
+            "- Wake-up call time\n"
+            "- Music preference (Classical/Rock/Hip-Hop/None)\n"
+            "- Language preference (English/Hindi)\n"
+            "\nOnce I have these, I will confirm your booking."
         )
     if not confirm:
         return "✅ Booking cancelled."
@@ -267,7 +346,14 @@ def book_room(data: Rooms_booking) -> str:
         cursor.execute("""
             INSERT INTO rooms (room_no, check_in, check_out, no_of_person, amount)
             VALUES (%s, %s, NULL, %s, %s)
+            RETURNING user_id
         """, (room_no, check_in, no_of_persons, price_one_room))
+
+        user_id = cursor.fetchone()[0]
+        if preferences_text:
+            prefs = extract_preferences(preferences_text, llm)
+            save_preferences(cursor, user_id, room_no, prefs)
+
     conn.commit()
     if days > 0:
         duration_text = f"{days} day{'s' if days > 1 else ''}"
