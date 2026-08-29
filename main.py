@@ -17,9 +17,10 @@ import os
 from datetime import date,time
 import math
 import json
+import re
 
 load_dotenv()
-os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY1")
+os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY2")
 
 conn = psycopg2.connect(
     dbname=os.getenv("DB_NAME"),
@@ -112,6 +113,7 @@ system_prompt = ChatPromptTemplate.from_messages([
 
     Rules:
     - Suggest activities in a caring and natural way (not like marketing or promotion). 
+    - If user ask for room packages, tell the room price breakdown.
     - Never invent contact info or links.
     - Use ask_hotel_info tool for any hotel data and price info you don’t know.
     - Redirect unrelated queries via the general_chat tool.
