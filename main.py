@@ -235,12 +235,23 @@ def extract_preferences(pref_text: str, llm) -> Preferences:
         print("LLM parsing failed:", e, response.content)
         return Preferences()  
 def save_preferences(cursor, user_id: int, room_no: int, prefs: Preferences):
-    """Insert structured preferences into DB."""
+    """Insert or update structured preferences into DB."""
+
     cursor.execute("""
         INSERT INTO preferences 
         (user_id, room_no, temperature, diet, menu_type, pillow_type, allergies,
          lighting_preference, wake_up_call, music_preference, language_preference)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        ON CONFLICT (user_id, room_no) DO UPDATE SET
+            temperature = EXCLUDED.temperature,
+            diet = EXCLUDED.diet,
+            menu_type = EXCLUDED.menu_type,
+            pillow_type = EXCLUDED.pillow_type,
+            allergies = EXCLUDED.allergies,
+            lighting_preference = EXCLUDED.lighting_preference,
+            wake_up_call = EXCLUDED.wake_up_call,
+            music_preference = EXCLUDED.music_preference,
+            language_preference = EXCLUDED.language_preference;
     """, (
         user_id, room_no,
         prefs.temperature,
@@ -356,7 +367,10 @@ def book_room(data: Rooms_booking) -> str:
         user_id = cursor.fetchone()[0]
         if preferences_text:
             prefs = extract_preferences(preferences_text, llm)
-            save_preferences(cursor, user_id, room_no, prefs)
+            if any([prefs.temperature, prefs.diet, prefs.menu_type, prefs.pillow_type,
+                    prefs.allergies, prefs.lighting_preference, prefs.wake_up_call,
+                    prefs.music_preference, prefs.language_preference]):
+                save_preferences(cursor, user_id, room_no, prefs)
 
     conn.commit()
     if days > 0:

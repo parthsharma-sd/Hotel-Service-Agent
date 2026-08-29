@@ -155,7 +155,7 @@ def show_preferences():
                        p.pillow_type, p.allergies, p.lighting_preference,
                        p.wake_up_call, p.music_preference, p.language_preference
                 FROM preferences p
-                JOIN rooms r ON p.user_id = r.user_id AND p.room_no = r.room_no
+                JOIN rooms r ON p.user_id = r.user_id 
                 WHERE r.check_out IS NULL
             """)
             rows = cur.fetchall()
@@ -163,18 +163,26 @@ def show_preferences():
             if not rows:
                 st.info("No active guest preferences found.")
                 return
+            shown_users = set()
 
             for r in rows:
+                if (r[0], r[1]) in shown_users:  # avoid duplicates
+                    continue
+                shown_users.add((r[0], r[1]))
+
                 with st.expander(f"👤 User {r[0]} | Room {r[1]}"):
-                    st.write(f"🌡️ Temperature: {r[2]}")
-                    st.write(f"🥗 Diet: {r[3]}")
-                    st.write(f"📖 Menu Type: {r[4]}")
-                    st.write(f"🛏️ Pillow: {r[5]}")
-                    st.write(f"⚠️ Allergies: {r[6]}")
-                    st.write(f"💡 Lighting: {r[7]}")
-                    st.write(f"⏰ Wake-up Call: {r[8]}")
-                    st.write(f"🎵 Music: {r[9]}")
-                    st.write(f"🈯 Language: {r[10]}")
+                    if all(x is None for x in r[2:]):
+                        st.write("❌ No preferences set.")
+                    else:
+                        st.write(f"🌡️ Temperature: {r[2]}")
+                        st.write(f"🥗 Diet: {r[3]}")
+                        st.write(f"📖 Menu Type: {r[4]}")
+                        st.write(f"🛏️ Pillow: {r[5]}")
+                        st.write(f"⚠️ Allergies: {r[6]}")
+                        st.write(f"💡 Lighting: {r[7]}")
+                        st.write(f"⏰ Wake-up Call: {r[8]}")
+                        st.write(f"🎵 Music: {r[9]}")
+                        st.write(f"🈯 Language: {r[10]}")
 
 def show_billing():
     st.subheader("Billing Summary")
