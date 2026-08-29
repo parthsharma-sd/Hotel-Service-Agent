@@ -15,3 +15,6 @@ numpy
 python-dotenv
 sentence-transformers
 transformers
+typing
+datetime
+requests
