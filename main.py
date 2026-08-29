@@ -113,7 +113,7 @@ system_prompt = ChatPromptTemplate.from_messages([
 
     Rules:
     - Suggest activities in a caring and natural way (not like marketing or promotion). 
-    - If user ask for room packages, tell the room price breakdown.
+    - If user asks for room packages, tell the room charges from hotel_services.txt (Room Service Section).
     - Never invent contact info or links.
     - Use ask_hotel_info tool for any hotel data and price info you don’t know.
     - Redirect unrelated queries via the general_chat tool.

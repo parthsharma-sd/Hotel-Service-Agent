@@ -108,6 +108,23 @@ def manage_rooms():
                                 conn2.commit()
                                 st.success(f"Checkout marked for User ID {r[0]} in Room {r[1]}")
                                 st.rerun()
+                    new_amount = st.number_input(
+                        f"Enter amount for Room {r[1]} (User ID {r[0]})",
+                        min_value=0.0,
+                        step=100.0,
+                        key=f"amount_{r[0]}"
+                    )
+
+                    if st.button(f"Update Amount for User ID {r[0]}", key=f"update_amount_{r[0]}"):
+                        with get_connection() as conn2:
+                            with conn2.cursor() as cur2:
+                                cur2.execute("""
+                                        UPDATE rooms SET amount = %s
+                                        WHERE user_id = %s
+                                    """, (new_amount, r[0]))
+                                conn2.commit()
+                                st.success(f"Amount updated to {new_amount} for User ID {r[0]}")
+                                st.rerun()
 
     with st.form("Add Room"):
         st.markdown("### Add New Room Entry")
