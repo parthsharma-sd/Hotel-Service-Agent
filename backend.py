@@ -14,6 +14,7 @@ import psycopg2
 from typing import Optional
 from dotenv import load_dotenv
 import os
+import numpy as np
 from datetime import date,time
 import math
 import json
