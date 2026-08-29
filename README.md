@@ -19,6 +19,7 @@ A conversational AI assistant for Ralton Hotel, Shillong. This chatbot helps gue
 - General wifi password giving
 - Events/banquet hall booking(currently via reception)
 - Feedback via google form (when user type exit)
+- Multilingual support
 
 ---
 ## 🧠 System Architecture 
