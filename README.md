@@ -81,6 +81,6 @@ No sensitive user data is collected. Google Forms used for feedback/bookings are
 
 ## 👤 Author
 
-- **partj sharma**
+- **parth sharma**
 -  GitHub: (https://github.com/parthsharma-sd)
 
