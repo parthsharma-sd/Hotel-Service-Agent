@@ -169,13 +169,6 @@ are intentionally outlined as future enhancements to address scalability and rel
 | Dashboard          | Power BI                                  |
 | Interface          | Hugging Face Spaces                       |
 
----
-## 🔗Link to access the Agent:
-```https://vidhan66-hotel-agent.hf.space```
-
-## 🔗Link for Staff Interface
-```https://vidhan66-staff-dashboard.hf.space/```
-
 ## 🛠️ Setup Instructions
 
 1. Clone the repo  
